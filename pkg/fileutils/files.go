@@ -14,7 +14,7 @@ func GetFiles(rootpath, prefix string, callback Callback) error {
 		return err
 	}
 	for _, i := range infos {
-		if !strings.HasPrefix(i.Name(), prefix) {
+		if prefix == "" || strings.HasPrefix(strings.ToLower(i.Name()), strings.ToLower(prefix)) {
 			ok := callback(i)
 			if !ok {
 				return nil
