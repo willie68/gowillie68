@@ -8,8 +8,8 @@ import (
 	"slices"
 	"sync"
 
-	utils "github.com/willie68/gowillie68/pkg"
 	"github.com/willie68/gowillie68/pkg/distributefilelock"
+	utils "github.com/willie68/gowillie68/pkg/fileutils"
 	"github.com/willie68/gowillie68/pkg/logging"
 )
 
