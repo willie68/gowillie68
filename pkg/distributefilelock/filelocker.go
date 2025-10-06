@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	utils "github.com/willie68/gowillie68/pkg"
+	utils "github.com/willie68/gowillie68/pkg/fileutils"
 )
 
 type DistributedFileLock interface {
