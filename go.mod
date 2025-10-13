@@ -18,5 +18,6 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/onsi/gomega v1.38.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	golang.org/x/exp v0.0.0-20251002181428-27f1f14c8bb9 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
