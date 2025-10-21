@@ -8,16 +8,40 @@ import (
 	"github.com/samber/do"
 )
 
-func Routes() *chi.Mux {
+func Routes(inj *do.Injector) *chi.Mux {
 	router := chi.NewRouter()
-	router.Get("/", GetMetrics)
+	router.Get("/", GetMetricsHandler(inj))
+	router.Post("/reset", ResetMetricsHandler(inj))
+	router.Post("/reset/{name}", ResetMonitorHandler(inj))
 	return router
 }
 
-func GetMetrics(response http.ResponseWriter, request *http.Request) {
-	ms := do.MustInvoke[*Service](nil)
-	datas := ms.Datas()
+func GetMetricsHandler(inj *do.Injector) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ms := do.MustInvoke[*Service](inj)
+		datas := ms.Datas()
 
-	render.Status(request, http.StatusOK)
-	render.JSON(response, request, datas)
+		render.Status(r, http.StatusOK)
+		render.JSON(w, r, datas)
+	})
+}
+
+func ResetMetricsHandler(inj *do.Injector) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ms := do.MustInvoke[*Service](inj)
+		ms.Reset()
+
+		render.Status(r, http.StatusOK)
+	})
+}
+
+func ResetMonitorHandler(inj *do.Injector) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		name := chi.URLParam(r, "name")
+		ms := do.MustInvoke[*Service](inj)
+		point := ms.Point(name)
+		point.Reset()
+
+		render.Status(r, http.StatusOK)
+	})
 }

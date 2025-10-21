@@ -28,6 +28,20 @@ func (p *Point) Name() string {
 	return p.name
 }
 
+func (p *Point) Reset() {
+	p.calcLock.Lock()
+	defer p.calcLock.Unlock()
+	p.min = 0
+	p.max = 0
+	p.average = 0
+	p.total = 0
+	p.errorCount = 0
+	p.count = 0
+	p.squareSum = 0
+	p.active = 0
+	p.maxActive = 0
+}
+
 // Monitor get a new monitor
 func (p *Point) Monitor() Monitor {
 	if p.sactive {

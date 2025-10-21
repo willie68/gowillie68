@@ -1,6 +1,8 @@
 package measurement
 
 import (
+	"slices"
+	"strings"
 	"sync"
 )
 
@@ -52,5 +54,14 @@ func (s *Service) Datas() []Data {
 	for _, v := range s.points {
 		datas = append(datas, v.Data())
 	}
+	slices.SortFunc(datas, func(d1, d2 Data) int {
+		return strings.Compare(d1.Name, d2.Name)
+	})
 	return datas
+}
+
+func (s *Service) Reset() {
+	for _, v := range s.points {
+		v.Reset()
+	}
 }
