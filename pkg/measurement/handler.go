@@ -5,10 +5,10 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	"github.com/samber/do"
+	"github.com/samber/do/v2"
 )
 
-func Routes(inj *do.Injector) *chi.Mux {
+func Routes(inj do.Injector) *chi.Mux {
 	router := chi.NewRouter()
 	router.Get("/", GetMetricsHandler(inj))
 	router.Post("/reset", ResetMetricsHandler(inj))
@@ -16,7 +16,7 @@ func Routes(inj *do.Injector) *chi.Mux {
 	return router
 }
 
-func GetMetricsHandler(inj *do.Injector) http.HandlerFunc {
+func GetMetricsHandler(inj do.Injector) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ms := do.MustInvoke[*Service](inj)
 		datas := ms.Datas()
@@ -26,7 +26,7 @@ func GetMetricsHandler(inj *do.Injector) http.HandlerFunc {
 	})
 }
 
-func ResetMetricsHandler(inj *do.Injector) http.HandlerFunc {
+func ResetMetricsHandler(inj do.Injector) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ms := do.MustInvoke[*Service](inj)
 		ms.Reset()
@@ -35,7 +35,7 @@ func ResetMetricsHandler(inj *do.Injector) http.HandlerFunc {
 	})
 }
 
-func ResetMonitorHandler(inj *do.Injector) http.HandlerFunc {
+func ResetMonitorHandler(inj do.Injector) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		name := chi.URLParam(r, "name")
 		ms := do.MustInvoke[*Service](inj)
