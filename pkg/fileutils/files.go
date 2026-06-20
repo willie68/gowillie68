@@ -85,3 +85,100 @@ func HashFile(filename string) string {
 	}
 	return hex.EncodeToString(h.Sum(nil))
 }
+
+// SanitizePathSegment strips characters that are unsafe in directory names.
+func SanitizePathSegment(s string) string {
+	s = strings.TrimSpace(s)
+	replacer := strings.NewReplacer(
+		"/", "_",
+		"\\", "_",
+		":", "_",
+		"*", "_",
+		"?", "_",
+		"\"", "_",
+		"<", "_",
+		">", "_",
+		"|", "_",
+	)
+	s = replacer.Replace(s)
+	s = strings.Map(func(r rune) rune {
+		if r < 32 {
+			return -1
+		}
+		return r
+	}, s)
+	s = strings.TrimRight(s, " .")
+	if s == "" || s == "." || s == ".." {
+		return "unknown"
+	}
+	if IsWindowsReservedName(s) {
+		return "_" + s
+	}
+	return s
+}
+
+// SanitizeFileName returns a sanitized filename, removing or replacing characters that are unsafe in filenames.
+func SanitizeFileName(name string) string {
+	base := filepath.Base(strings.TrimSpace(name))
+	if base == "" || base == "." || base == ".." {
+		return ""
+	}
+
+	ext := filepath.Ext(base)
+	stem := strings.TrimSuffix(base, ext)
+	stem = SanitizePathSegment(stem)
+	if stem == "" || stem == "unknown" {
+		stem = "file"
+	}
+
+	ext = strings.Map(func(r rune) rune {
+		if r < 32 {
+			return -1
+		}
+		if strings.ContainsRune("<>:\\|?*\"", r) {
+			return -1
+		}
+		return r
+	}, ext)
+	ext = strings.TrimRight(ext, " .")
+
+	if IsWindowsReservedName(stem) {
+		stem = "_" + stem
+	}
+
+	return stem + ext
+}
+
+// IsWindowsReservedName checks if a name is a reserved name in Windows (e.g., CON, PRN, AUX, NUL, COM1, LPT1, etc.)
+func IsWindowsReservedName(s string) bool {
+	upper := strings.ToUpper(strings.TrimSpace(s))
+	if upper == "" {
+		return false
+	}
+	reserved := map[string]struct{}{
+		"CON":  {},
+		"PRN":  {},
+		"AUX":  {},
+		"NUL":  {},
+		"COM1": {},
+		"COM2": {},
+		"COM3": {},
+		"COM4": {},
+		"COM5": {},
+		"COM6": {},
+		"COM7": {},
+		"COM8": {},
+		"COM9": {},
+		"LPT1": {},
+		"LPT2": {},
+		"LPT3": {},
+		"LPT4": {},
+		"LPT5": {},
+		"LPT6": {},
+		"LPT7": {},
+		"LPT8": {},
+		"LPT9": {},
+	}
+	_, ok := reserved[upper]
+	return ok
+}
